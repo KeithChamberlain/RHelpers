@@ -4,6 +4,15 @@
 ##
 
 
+impute.fun <- function(y, fun){
+    '
+    uses fun to impute missing values
+    '
+    y[is.na(y)] <- fun(y, na.rm=TRUE)
+    y
+}
+
+
 impute.distribution <- function(y, distribution=rnorm, ...){
     '
     uses distribution to impute missing values
@@ -16,9 +25,9 @@ impute.distribution <- function(y, distribution=rnorm, ...){
 
 impute.lm.smooth <- function(y, x, degree=2){
     '
-    uses fun to impute missing values
+    uses lm to impute missing values
     '
-    df <- data.frame(y=y, x=as.Date(x))
+    df <- data.frame(y, x)
     nas <- is.na(df$y)
     fit <- lm(y~poly(x, degree=degree), data=df, na.action=na.omit)
     df[nas, "y"] <- predict(fit, newdata=df[nas, ])
