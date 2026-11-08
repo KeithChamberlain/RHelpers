@@ -45,3 +45,16 @@ impute.categorical <- function(y){
     y[is.na(y)] <- sample(x=names(yy), size=sum(is.na(y)), prob=probs, replace=TRUE)
     y
 }
+
+
+impute.fun.formula <- function(fun, formula, data, dv, ...){
+    '
+    Use fun and multivariate formula to impute dv missing values. Any missing
+    values in independent variables will be silently passed to dv.
+    '
+    nas <- as.logical(rowSums(
+            data.frame(lapply(colnames(data), function(x) is.na(data[, x])))))
+    model <- fun(formula=as.formula(formula), data=data, ..., na.action=na.omit)
+    data[nas, dv] <- predict(model, newdata=data[nas, ])
+    data[, dv]
+}
