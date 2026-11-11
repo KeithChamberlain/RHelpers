@@ -61,8 +61,31 @@ impute.fun.formula <- function(fun, formula, data, dv, ...){
     values in independent variables will be silently passed to dv.
     '
     nas <- as.logical(rowSums(
-            data.frame(lapply(colnames(data), function(x) is.na(data[, x])))))
-    model <- fun(formula=as.formula(formula), data=data, ..., na.action=na.omit)
+        data.frame(lapply(colnames(data), function(x) is.na(data[, x])))))
+    model <- fun(formula=as.formula(formula), data=data[!nas, ], ...)
     data[nas, dv] <- predict(model, newdata=data[nas, ])
+    data
+}
+
+
+impute.fun.index <- function(fun, y, index, ...){
+    '
+    Use index to identify points to impute. NAs handled separately with
+    parameter through `...`
+    '
+    y[index] <- fun(y[!index], ...)
+}
+
+
+impute.fun.formula.index <- function(fun, formula, data, dv, index_col, ...){
+    '
+    Use fun that has a predict method, and multivariate formula to impute dv
+    values found in index_col. Missing independent variables values are
+    silently passed to the dependent variable. Send na policy through `...`.
+    '
+    model <- fun(formula=as.formula(formula), data=data[!data[, index_col], ],
+                 ...)
+    data[data[, index_col], dv] <- predict(
+        model, newdata=data[data[, index_col], ])
     data
 }
