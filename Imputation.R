@@ -8,7 +8,7 @@ impute.fun <- function(y, fun, ...){
     '
     uses fun to impute missing values
     '
-    y[is.na(y)] <- fun(y, ...)
+    y[is.na(y)] <- fun(y[!is.na(y)], ...)
     y
 }
 
