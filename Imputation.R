@@ -4,29 +4,37 @@
 ##
 
 
-impute.fun <- function(y, fun){
+impute.fun <- function(y, fun, ...){
     '
     uses fun to impute missing values
     '
-    y[is.na(y)] <- fun(y, na.rm=TRUE)
+    y[is.na(y)] <- fun(y, ...)
     y
 }
 
 
 impute.distribution <- function(y, distribution=rnorm, ...){
     '
-    uses distribution to impute missing values
+    uses distribution to impute missing values.
     '
     distribution_of_data <- distribution(n=length(y), ...)
-    y[is.na(y)] <- distribution_of_data[is.na(y)]
-    y
+    coalesce(y, distribution_of_data)
 }
 
 
-impute.lm.smooth <- function(y, x, degree=2){
+impute.walk <- function(y, distribution, ...){
+    '
+    uses rolling sum of a distribution for a random walk
+    '
+    coalesce(y, cumsum(c(y[!is.na(y)][1], distribution(n=length(y), ...)[-1])))
+}
+
+
+impute.lm.smooth <- function(y, x, degree=6){
     '
     uses lm to impute missing values
     '
+    errorCondition(message="use impute.fun.formula() instead")
     df <- data.frame(y, x)
     nas <- is.na(df$y)
     fit <- lm(y~poly(x, degree=degree), data=df, na.action=na.omit)
@@ -56,5 +64,5 @@ impute.fun.formula <- function(fun, formula, data, dv, ...){
             data.frame(lapply(colnames(data), function(x) is.na(data[, x])))))
     model <- fun(formula=as.formula(formula), data=data, ..., na.action=na.omit)
     data[nas, dv] <- predict(model, newdata=data[nas, ])
-    data[, dv]
+    data
 }
