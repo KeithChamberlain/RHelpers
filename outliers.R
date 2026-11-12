@@ -36,3 +36,16 @@ outlier.quantile <- function(data, quantiles=c(0.02, 0.98), na.rm=FALSE){
          data > quantile(data, quantiles[2], na.rm=na.rm))
 }
 
+
+outlier.test <- function(data, test=pf, threshold=0.025, ...){
+    '
+    Outliers by test statistic. Returns a logical vector identifying outliers.
+    '
+    test(data, ...) < threshold | (1 - test(data, ...)) < threshold
+
+    # Examples:
+    # dfs<-data.frame(data=rnorm(1000, mean=3, sd=5), x=1:1000)
+    # dfs$pn <- pnorm(dfs$data, mean=mean(dfs$data), sd=sd(dfs$data))
+    # dfs$ol <- dfs$pn < 1/nrow(dfs) | 1-dfs$pn < 1/nrow(dfs)
+    # plot(dfs$data~x, col=ifelse(dfs$ol, "darkred", "blue"))
+}
