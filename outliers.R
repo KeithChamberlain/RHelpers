@@ -96,6 +96,6 @@ outlier.test.formula <- function(data, formula, threshold=1/nrow(data),
     Outliers by multivariate test statistic using a formula
     '
     resid <- resid(model_fun(formula=formula, data=data))
-    result <- rnorm(resid, mean=mean(resid), sd=sd(resid), ...)
+    result <- pnorm(resid, mean=mean(resid), sd=sd(resid), ...)
     result < threshold | result > 1-threshold
 }
