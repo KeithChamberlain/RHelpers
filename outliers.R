@@ -29,6 +29,11 @@
 #' @value A logical vector indicating `TRUE` for an outlier and `FALSE`
 #'     otherwise.
 #'
+#' @references
+#' Tukey JW (1977). Exploratory Data Analysis, number 2 series
+#'     Addison-Wesley series in behavioral science. Addison-Wesley Publishing
+#'     Company. ISBN 9780201076165.
+#' 
 #' @seealso [stats::mad()] for the median absolute deviation. [stats::IQR()]
 #'     for the interquartile range. [score()] for an interface to z-score like
 #'     transformations. [Distribution] for standard distributions, including,
