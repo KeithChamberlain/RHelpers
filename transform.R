@@ -69,5 +69,7 @@ method_of_moments_log <- function(mean, sd){
     '
     method of moments transformation between mean and sd to log scale.
     '
-    c("sigma"=sqrt(log(1+sd^2/mean^2)), "mu"=log(mean) - s^2/2)
+    sigma=sqrt(log(1+sd^2/mean^2))
+    mu=log(mean) - sigma^2/2
+    c("sigma"=sigma, "mu"=mu)
 }
