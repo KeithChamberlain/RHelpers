@@ -4,8 +4,53 @@
 # 2026-11-07
 ##
 
+#' @title Identify Outliers
+#'
+#' @description
+#' Functions to resolve records meeting spefified criteria as outliers.
+#'
+#' @usage
+#' `outlier.iqr(data, multiplier=1.5, na.rm=FALSE)`
+#' `outlier.mad(data, fun=median, multiplier=3, na.rm=FALSE)`
+#' `outlier.quantile(data, quantiles=c(0.02, 0.98), na.rm=FALSE)`
+#' `outlier.test(data, test=pf, threshold=0.025, ...)`
+#' `outlier.test.formula(data, formula, test=pf, threshold=0.025, ...)`
+#'
+#' @param data numeric vector.
+#' @param multiplier range multiplier for IQR and MAD.
+#' @param fun center function.
+#' @param quantiles vector of low, high quantile threshold values.
+#' @param test probability distribution function.
+#' @param threshold cutoff threshold for identifying outliers.
+#' @param formula character or `formula` model representation.
+#' @param na.rm logical; if TRUE, remove NAs.
+#' @param ... Other options to control the test function.
+#'
+#' @value A logical vector indicating `TRUE` for an outlier and `FALSE`
+#'     otherwise.
+#'
+#' @seealso [stats::mad()] for the median absolute deviation. [stats::IQR()]
+#'     for the interquartile range. [score()] for an interface to z-score like
+#'     transformations. [Distribution] for standard distributions, including,
+#'     e.g. [stats::pnorm()], [stats::pnbinom()], or [stats::pbeta()] for the
+#'     normal, negative binomial and beta probability distribution functions.
+#'
+#' @examples:
+#'
+#' ## Generate Data
+#' data <- rnorm(1000, mean=3, sd=5)
+#' x <- 1:length(data)
+#'
+#' ## Identify Outliers
+#' ol <- outlier.test(data=data, test=pnorm, threshold=1/length(data),
+#'                    mean=mean(data), sd=sd(data))
+#' ## Visualize
+#' plot(data~x, col=ifelse(ol, "darkred", "blue"))
+#'
+#' @export
 
-outlier.iqr <- function(data, fun=mean, multiplier=1.5, na.rm=FALSE){
+
+outlier.iqr <- function(data, multiplier=1.5, na.rm=FALSE){
     '
     outliers by iqr. Returns a logical vector identifying outliers.
     '
@@ -41,11 +86,16 @@ outlier.test <- function(data, test=pf, threshold=0.025, ...){
     '
     Outliers by test statistic. Returns a logical vector identifying outliers.
     '
-    test(data, ...) < threshold | (1 - test(data, ...)) < threshold
+    test(data, ...) < threshold | test(data, ...) > 1-threshold
+}
 
-    # Examples:
-    # dfs<-data.frame(data=rnorm(1000, mean=3, sd=5), x=1:1000)
-    # dfs$pn <- pnorm(dfs$data, mean=mean(dfs$data), sd=sd(dfs$data))
-    # dfs$ol <- dfs$pn < 1/nrow(dfs) | 1-dfs$pn < 1/nrow(dfs)
-    # plot(dfs$data~x, col=ifelse(dfs$ol, "darkred", "blue"))
+
+outlier.test.formula <- function(data, formula, threshold=1/nrow(data),
+                                 model_fun=lm, ...){
+    '
+    Outliers by multivariate test statistic using a formula
+    '
+    resid <- resid(model_fun(formula=formula, data=data))
+    result <- rnorm(resid, mean=mean(resid), sd=sd(resid), ...)
+    result < threshold | result > 1-threshold
 }
